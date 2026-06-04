@@ -6,11 +6,15 @@ Guidance for working in this repository. Single source of truth for human and AI
 
 ```bash
 uv sync                       # install dev dependencies
-uv run pytest                 # tests
+make test-unit                # in-process tests, ~0.06s, run constantly
+make test-integration         # real embedder + vector store, ~6s
+make test                     # everything
 uv run ruff check .           # lint
 uv run ruff format .          # format
 uv run pyright                # type check (strict)
 ```
+
+`make test-unit` is effectively instant (no model load, no I/O). Run it after every meaningful change, not just at the end. Reserve `make test-integration` (loads the embedding model) and the full `make test` for before committing.
 
 Eval commands are added as the evaluation harness lands (see the roadmap in README.md and the relevant plan in `plans/`).
 
@@ -55,7 +59,7 @@ def test_hybrid_retrieval_beats_baseline_on_acronym_queries():
 ## Workflow
 
 - **Test-first** for business logic: write the test, watch it fail, then implement. Glue and config do not need a test-first dance.
-- Run unit tests after each meaningful change, not only at the end.
+- Run `make test-unit` after each meaningful change, not only at the end. It is effectively instant.
 - Refactor on green before moving on.
 
 ## Pointers
