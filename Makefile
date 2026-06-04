@@ -1,7 +1,7 @@
 .PHONY: index test lint type format
 
 index:
-	uv run python -m rag_to_production.ingestion.build_index
+	uv run rag index
 
 test:
 	uv run pytest

@@ -17,6 +17,9 @@ classifiers = [
 
 dependencies = ["chromadb", "sentence-transformers", "google-genai", "httpx"]
 
+[project.scripts]
+rag = "rag_to_production.cli:main"
+
 [project.urls]
 Homepage = "https://github.com/mkrtchian/rag-to-production"
 Repository = "https://github.com/mkrtchian/rag-to-production"
