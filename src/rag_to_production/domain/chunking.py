@@ -8,6 +8,12 @@ class ChunkingPolicy:
     chunk_size: int
     overlap: int
 
+    def __post_init__(self) -> None:
+        if self.chunk_size <= 0:
+            raise ValueError(f"chunk_size must be positive, got {self.chunk_size}")
+        if not 0 <= self.overlap < self.chunk_size:
+            raise ValueError(f"overlap must be in [0, {self.chunk_size}), got {self.overlap}")
+
 
 def chunk_document(doc: Document, policy: ChunkingPolicy) -> list[Chunk]:
     stride = policy.chunk_size - policy.overlap

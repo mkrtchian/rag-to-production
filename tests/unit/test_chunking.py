@@ -1,6 +1,8 @@
+import pytest
+
 import tests.unit.test_chunking_given as given
 import tests.unit.test_chunking_then as then
-from rag_to_production.domain.chunking import chunk_document
+from rag_to_production.domain.chunking import ChunkingPolicy, chunk_document
 
 
 def test_fixed_size_window_yields_expected_count_and_overlap():
@@ -31,3 +33,13 @@ def test_code_fence_is_split_mid_unit():
     chunks = chunk_document(doc, policy)
 
     then.the_code_fence_is_split_across_chunks(chunks)
+
+
+def test_policy_rejects_overlap_not_smaller_than_chunk_size():
+    with pytest.raises(ValueError):
+        ChunkingPolicy(chunk_size=100, overlap=100)
+
+
+def test_policy_rejects_non_positive_chunk_size():
+    with pytest.raises(ValueError):
+        ChunkingPolicy(chunk_size=0, overlap=0)
