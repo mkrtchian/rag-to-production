@@ -1,8 +1,9 @@
 import re
 
-# OpenAI-family keys: an `sk-` prefix followed by a long opaque token. The 20-char
-# floor avoids redacting prose like "sk-123" while catching sk-proj / sk-harmony variants.
-_SECRET_PATTERNS = (re.compile(r"sk-[A-Za-z0-9_-]{20,}"),)
+# OpenAI-family keys: `sk-`, an optional account-type label, then a long base62 token.
+# The left boundary stops `sk-` matching inside hyphenated prose ("risk-", "ask-", "task-");
+# base62 (no `-`/`_`) is the key body's real charset and keeps hyphenated slugs out.
+_SECRET_PATTERNS = (re.compile(r"(?<![A-Za-z0-9])sk-(?:proj-|svcacct-|admin-)?[A-Za-z0-9]{20,}"),)
 _REDACTION = "[REDACTED-SECRET]"
 
 
