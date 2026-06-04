@@ -3,6 +3,7 @@ from collections.abc import Iterator
 from pathlib import Path
 
 from rag_to_production.domain.models import Document
+from rag_to_production.ingestion.redaction import scrub_secrets
 
 
 def load_issues(issues_path: Path) -> Iterator[Document]:
@@ -20,4 +21,5 @@ def load_issues(issues_path: Path) -> Iterator[Document]:
             # step 1 projects only `text`; the raw per-thread fields (number,
             # url, state, labels, dates, comments) stay in the file as
             # provenance for step 5, unused here.
-            yield Document(id=f"issue-{thread['number']}", text=thread["text"], source="issues")
+            text = scrub_secrets(thread["text"])
+            yield Document(id=f"issue-{thread['number']}", text=text, source="issues")

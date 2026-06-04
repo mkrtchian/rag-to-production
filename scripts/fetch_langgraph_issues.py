@@ -16,6 +16,8 @@ import subprocess
 import time
 from typing import Any, cast
 
+from rag_to_production.ingestion.redaction import scrub_secrets
+
 DEFAULT_REPO = "langchain-ai/langgraph"
 DEFAULT_OUTPUT = "data/langgraph-issues.jsonl"
 MIN_COMMENT_CHARS = 80
@@ -53,12 +55,12 @@ def _has_human_answer(comments: list[Any], min_comment_chars: int) -> bool:
 
 
 def _to_record(issue: Any, raw_comments: list[Any], extraction_date: str) -> dict[str, Any]:
-    title = _text(issue.get("title"))
-    body = _text(issue.get("body"))
+    title = scrub_secrets(_text(issue.get("title")))
+    body = scrub_secrets(_text(issue.get("body")))
     comments = [
         {
             "author": _text(_field(comment.get("user"), "login")),
-            "body": _text(comment.get("body")),
+            "body": scrub_secrets(_text(comment.get("body"))),
             "created_at": comment.get("created_at"),
         }
         for comment in raw_comments
