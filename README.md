@@ -55,7 +55,7 @@ The corpus is fetched from a pinned upstream commit, so the build is reproducibl
 
 ## Step 1: the baseline and why it breaks
 
-The pattern numbers below (P6 through P12) refer to the RAG pattern catalog in Lakshmanan & Hapke, [_Generative AI Design Patterns_](https://www.oreilly.com/library/view/generative-ai-design/9781098165048/), which runs from Basic RAG (P6) to Deep Search (P12) as an escalator from demo to production.
+The pattern numbers below (P6 through P12) refer to the RAG pattern catalog in Lakshmanan & Hapke, [_Generative AI Design Patterns_](https://www.oreilly.com/library/view/generative-ai-design/9798341622654/), which runs from Basic RAG (P6) to Deep Search (P12) as an escalator from demo to production.
 
 The baseline retrieval is single-vector embeddings (Pattern 7, Semantic Indexing). "Basic" here describes the overall simplicity of the pipeline, not keyword retrieval: index, embed, retrieve top-k, generate, with fixed-size chunking and one shared index. We start here because most teams equate RAG with "a vector DB and nothing else", which is exactly the starting point whose limits we name.
 
