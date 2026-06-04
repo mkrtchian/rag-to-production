@@ -16,3 +16,6 @@ build/
 # Ingestion outputs
 chroma/
 snapshot/
+
+# Local scratch / ephemeral handoffs (never committed)
+.scratch/
