@@ -1,11 +1,11 @@
 import tests.unit.fakes as fakes
 from rag_to_production.domain.chunking import ChunkingPolicy
-from rag_to_production.domain.models import Chunk, Document, RetrievedChunk
+from rag_to_production.domain.models import Chunk, Document, RetrievedChunk, Source
 from rag_to_production.domain.prompts import build_rag_prompt
 from rag_to_production.pipeline import answer_query, index_corpus
 
 
-def _document(doc_id: str, length: int, source: str) -> Document:
+def _document(doc_id: str, length: int, source: Source) -> Document:
     return Document(id=doc_id, text="x" * length, source=source)
 
 

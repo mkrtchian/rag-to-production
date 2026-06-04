@@ -1,8 +1,8 @@
 from rag_to_production.domain.chunking import ChunkingPolicy
-from rag_to_production.domain.models import Document
+from rag_to_production.domain.models import Document, Source
 
 
-def a_document_of_length(length: int, *, source: str = "docs") -> Document:
+def a_document_of_length(length: int, *, source: Source = "docs") -> Document:
     text = "".join(chr(ord("a") + (i % 26)) for i in range(length))
     return Document(id="doc-1", text=text, source=source)
 

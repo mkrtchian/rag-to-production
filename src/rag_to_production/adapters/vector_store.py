@@ -1,10 +1,11 @@
 from pathlib import Path
+from typing import cast
 
 import chromadb
 from chromadb import Metadata
 from chromadb.api.types import PyEmbeddings
 
-from rag_to_production.domain.models import Chunk, RetrievedChunk
+from rag_to_production.domain.models import Chunk, RetrievedChunk, Source
 
 _COLLECTION_NAME = "corpus"
 
@@ -53,7 +54,8 @@ def _to_retrieved_chunk(
         id=chunk_id,
         text=text,
         document_id=str(metadata["document_id"]),
-        source=str(metadata["source"]),
+        # the store round-trips a known corpus layer; cast at this untyped boundary
+        source=cast("Source", str(metadata["source"])),
     )
     # Chroma returns a cosine distance (lower = closer); convert once to a
     # similarity score so callers always sort by score descending.

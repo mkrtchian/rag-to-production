@@ -1,11 +1,16 @@
 from dataclasses import dataclass
+from typing import Literal
+
+# The corpus layers (ADR 003). "api_ref" is a decided layer not yet produced:
+# its ingestion (docstring extraction) is a later step.
+Source = Literal["docs", "api_ref", "issues"]
 
 
 @dataclass(frozen=True)
 class Document:
     id: str
     text: str
-    source: str  # "docs" | "api_ref" | "issues"
+    source: Source
     # naive baseline keeps source for display only; it is NOT used to filter
     # retrieval (that absence is a named limit -> Pattern 8 metadata, step 5)
 
@@ -15,7 +20,7 @@ class Chunk:
     id: str
     text: str
     document_id: str
-    source: str
+    source: Source
 
 
 @dataclass(frozen=True)
@@ -35,3 +40,12 @@ class RagAnswer:
 class IndexStats:
     documents_per_source: dict[str, int]
     chunks_per_source: dict[str, int]
+
+
+@dataclass(frozen=True)
+class ProseSource:
+    """Pinned origin of the prose layer: the subtree `path` of `repo` at `ref`."""
+
+    repo: str
+    ref: str
+    path: str
