@@ -12,3 +12,7 @@ __pycache__/
 # Build
 dist/
 build/
+
+# Ingestion outputs
+chroma/
+snapshot/

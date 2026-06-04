@@ -15,7 +15,7 @@ classifiers = [
     "Topic :: Software Development :: Libraries :: Python Modules",
 ]
 
-dependencies = []
+dependencies = ["chromadb", "sentence-transformers", "google-genai", "httpx"]
 
 [project.urls]
 Homepage = "https://github.com/mkrtchian/rag-to-production"
