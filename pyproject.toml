@@ -15,7 +15,13 @@ classifiers = [
     "Topic :: Software Development :: Libraries :: Python Modules",
 ]
 
-dependencies = ["chromadb", "sentence-transformers", "google-genai", "httpx"]
+dependencies = [
+    "chromadb",
+    "sentence-transformers",
+    "google-genai",
+    "httpx",
+    "python-dotenv>=1.2.2",
+]
 
 [project.scripts]
 rag = "rag_to_production.cli:main"

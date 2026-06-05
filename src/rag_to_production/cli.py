@@ -4,6 +4,8 @@ import sys
 from collections.abc import Iterator
 from itertools import chain
 
+from dotenv import load_dotenv
+
 from rag_to_production.adapters.embedder import SentenceTransformersEmbedder
 from rag_to_production.adapters.llm import GeminiLLM
 from rag_to_production.adapters.vector_store import ChromaVectorStore
@@ -17,6 +19,7 @@ from rag_to_production.pipeline import answer_query, index_corpus
 
 
 def main(argv: list[str] | None = None) -> int:
+    load_dotenv()
     args = _parse_args(argv)
     settings = Settings()
     if args.command == "index":

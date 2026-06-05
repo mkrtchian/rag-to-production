@@ -42,12 +42,12 @@ The corpus is three layers: the LangGraph documentation prose, an API reference 
 
 ```bash
 uv sync                                              # install dependencies
-export GEMINI_API_KEY=...                            # required for query only, not for index
+cp .env.example .env                                 # then put your key in .env (query only, not index)
 make index                                           # fetch the corpus and build the index
 uv run rag query "how do I add a conditional edge in LangGraph?"
 ```
 
-`make index` runs `uv run rag index`. Indexing embeds the corpus locally on CPU (sentence-transformers `BAAI/bge-small-en-v1.5`), so no API key is needed to build the index, and it can be slow on the full corpus. The query path calls Gemini (`gemini-3.1-flash-lite`), which reads `GEMINI_API_KEY` from the environment at startup.
+`make index` runs `uv run rag index`. Indexing embeds the corpus locally on CPU (sentence-transformers `BAAI/bge-small-en-v1.5`), so no API key is needed to build the index, and it can be slow on the full corpus. The query path calls Gemini (`gemini-3.1-flash-lite`), which reads `GEMINI_API_KEY` from `.env` (loaded at startup) or the shell environment, the shell taking precedence.
 
 The vector store is embedded Chroma. It runs in-process and persists to a gitignored local directory (`chroma/`), so there is no service to run and no Docker at this stage. A managed store behind the same `VectorStorePort` and a `docker-compose` stack arrive at step 3, the literal demo-to-production move.
 
