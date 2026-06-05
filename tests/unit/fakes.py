@@ -16,6 +16,10 @@ class FakeVectorStore:
         self.added_embeddings: list[list[float]] = []
         self._nearest = nearest or []
 
+    def reset(self) -> None:
+        self.added_chunks.clear()
+        self.added_embeddings.clear()
+
     def add(self, chunks: list[Chunk], embeddings: list[list[float]]) -> None:
         self.added_chunks.extend(chunks)
         self.added_embeddings.extend(embeddings)

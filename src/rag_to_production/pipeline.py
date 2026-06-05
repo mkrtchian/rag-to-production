@@ -13,6 +13,7 @@ def index_corpus(
     store: VectorStorePort,
     policy: ChunkingPolicy,
 ) -> IndexStats:
+    store.reset()
     documents_per_source: Counter[str] = Counter()
     chunks_per_source: Counter[str] = Counter()
     for document in documents:

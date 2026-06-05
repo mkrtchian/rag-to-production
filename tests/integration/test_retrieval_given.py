@@ -28,6 +28,10 @@ def a_corpus_with_a_distinctive_chunk() -> list[Document]:
     ]
 
 
+def only_the_edges_document() -> list[Document]:
+    return [a_corpus_with_a_distinctive_chunk()[0]]
+
+
 def a_real_embedder() -> SentenceTransformersEmbedder:
     return SentenceTransformersEmbedder(_EMBEDDER_MODEL)
 

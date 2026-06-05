@@ -16,3 +16,16 @@ def test_query_returns_the_chunk_whose_text_answers_it(tmp_path: Path):
 
     then.top_result_is_document(results, document_id="doc-edges")
     then.scores_are_similarities_in_descending_order(results)
+
+
+def test_re_indexing_a_smaller_corpus_drops_the_removed_document(tmp_path: Path):
+    embedder = given.a_real_embedder()
+    store = given.a_temp_dir_store(tmp_path)
+    policy = given.the_naive_chunking_policy()
+    index_corpus(given.a_corpus_with_a_distinctive_chunk(), embedder, store, policy)
+    index_corpus(given.only_the_edges_document(), embedder, store, policy)
+
+    query_embedding = embedder.embed(["how does the checkpointer persist graph state?"])[0]
+    results = store.search(query_embedding, k=3)
+
+    then.no_result_is_document(results, document_id="doc-checkpoint")

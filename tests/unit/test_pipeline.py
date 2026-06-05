@@ -31,6 +31,17 @@ def test_index_corpus_counts_documents_and_chunks_per_source():
     assert stats.chunks_per_source == {"docs": 6, "issues": 4}
 
 
+def test_re_indexing_replaces_the_previous_corpus():
+    policy = ChunkingPolicy(chunk_size=100, overlap=20)
+    embedder = fakes.FakeEmbedder()
+    store = fakes.FakeVectorStore()
+
+    index_corpus([_document("d1", length=100, source="docs")], embedder, store, policy)
+    index_corpus([_document("i1", length=100, source="issues")], embedder, store, policy)
+
+    assert {chunk.document_id for chunk in store.added_chunks} == {"i1"}
+
+
 def test_index_corpus_adds_embedded_chunks_to_the_store():
     documents = [_document("d1", length=100, source="docs")]
     policy = ChunkingPolicy(chunk_size=100, overlap=20)

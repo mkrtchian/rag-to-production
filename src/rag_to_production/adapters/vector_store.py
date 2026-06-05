@@ -2,7 +2,7 @@ from pathlib import Path
 from typing import cast
 
 import chromadb
-from chromadb import Metadata
+from chromadb import Collection, Metadata
 from chromadb.api.types import PyEmbeddings
 
 from rag_to_production.domain.models import Chunk, RetrievedChunk, Source
@@ -12,11 +12,15 @@ _COLLECTION_NAME = "corpus"
 
 class ChromaVectorStore:
     def __init__(self, persist_dir: Path) -> None:
-        client = chromadb.PersistentClient(path=str(persist_dir))
-        self._collection = client.get_or_create_collection(
-            name=_COLLECTION_NAME,
-            configuration={"hnsw": {"space": "cosine"}},
-        )
+        self._client = chromadb.PersistentClient(path=str(persist_dir))
+        self._collection = self._create_collection()
+
+    def reset(self) -> None:
+        # Drop and recreate the one corpus collection so a build starts clean. This
+        # is per-collection, not chromadb's global client.reset() (which wipes the
+        # whole database and is settings-gated).
+        self._client.delete_collection(_COLLECTION_NAME)
+        self._collection = self._create_collection()
 
     def add(self, chunks: list[Chunk], embeddings: list[list[float]]) -> None:
         as_embeddings: PyEmbeddings = list(embeddings)
@@ -42,6 +46,12 @@ class ChromaVectorStore:
                 strict=True,
             )
         ]
+
+    def _create_collection(self) -> Collection:
+        return self._client.get_or_create_collection(
+            name=_COLLECTION_NAME,
+            configuration={"hnsw": {"space": "cosine"}},
+        )
 
 
 def _to_retrieved_chunk(
