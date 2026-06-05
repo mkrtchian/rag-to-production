@@ -1,4 +1,5 @@
 import ast
+from collections import defaultdict
 from collections.abc import Iterator
 from dataclasses import dataclass
 from pathlib import Path
@@ -28,18 +29,10 @@ class PublicSymbol:
 
 def public_symbols(modules: dict[str, ModuleSource]) -> list[PublicSymbol]:
     symbols: list[PublicSymbol] = []
-    for entry_qualname, module in modules.items():
-        if not _is_entry_point(module):
-            continue
-        for name, defining in public_api(entry_qualname, module.source, module.is_package).items():
-            defining_module = modules.get(defining)
-            if defining_module is None:
-                continue
-            public_qualname = f"{entry_qualname}.{name}"
-            body = render_symbol(public_qualname, name, defining_module.source)
-            if body is None:
-                continue
-            symbols.append(PublicSymbol(qualname=public_qualname, text=body))
+    for (defining, name), qualname in sorted(_public_paths(modules).items()):
+        body = render_symbol(qualname, name, modules[defining].source)
+        if body is not None:
+            symbols.append(PublicSymbol(qualname=qualname, text=body))
     return symbols
 
 
@@ -64,6 +57,29 @@ def render_symbol(qualname: str, name: str, module_source: str) -> str | None:
     if isinstance(node, ast.ClassDef):
         return header + _render_class(node)
     return header + _render_function(node)
+
+
+def _public_paths(modules: dict[str, ModuleSource]) -> dict[tuple[str, str], str]:
+    # The same underlying symbol (its defining module plus name) is often reachable
+    # through several public entry points: a package re-export and the defining
+    # module's own __all__. Keep one path per symbol, the most public one, so a class
+    # is not indexed twice (once at its public import path, once at the internal module
+    # it lives in). The entry-point set still only approximates the public surface: a
+    # few low-level symbols that declare __all__ and are never re-exported survive at
+    # their module path. The exact surface is the upstream mkdocstrings nav.
+    candidates: dict[tuple[str, str], list[str]] = defaultdict(list)
+    for entry_qualname, module in modules.items():
+        if not _is_entry_point(module):
+            continue
+        for name, defining in public_api(entry_qualname, module.source, module.is_package).items():
+            if defining in modules:
+                candidates[(defining, name)].append(f"{entry_qualname}.{name}")
+    return {key: _most_public(paths, key) for key, paths in candidates.items()}
+
+
+def _most_public(paths: list[str], key: tuple[str, str]) -> str:
+    defining, name = key
+    return min(paths, key=lambda path: (path.count("."), path != f"{defining}.{name}", path))
 
 
 def _is_entry_point(module: ModuleSource) -> bool:

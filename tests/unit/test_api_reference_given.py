@@ -120,6 +120,16 @@ def a_function_only_package() -> dict[str, ModuleSource]:
     }
 
 
+def a_state_graph_package_with_internal_all() -> dict[str, ModuleSource]:
+    # state.py also declares __all__, so it is an entry point on its own and would
+    # produce an internal-path twin of StateGraph without deduplication.
+    state_with_all = STATE_MODULE + '\n__all__ = ["StateGraph", "add_messages"]\n'
+    return {
+        "langgraph.graph": a_module(GRAPH_INIT, is_package=True),
+        "langgraph.graph.state": a_module(state_with_all, is_package=False),
+    }
+
+
 def a_checkpoint_package_without_all() -> dict[str, ModuleSource]:
     return {
         "langgraph.checkpoint.base": a_module(CHECKPOINT_BASE_INIT, is_package=True),

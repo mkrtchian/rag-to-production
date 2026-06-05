@@ -73,12 +73,27 @@ def test_init_without_all_falls_back_to_non_underscore_surface():
 
     symbols = public_symbols(modules)
 
-    # BaseCheckpointSaver defined locally, InMemorySaver re-exported, _build_default dropped
+    # BaseCheckpointSaver defined locally, _build_default dropped. InMemorySaver is
+    # re-exported by base but kept once, at its defining home (memory), by the dedup.
     then.the_qualnames_are(
         symbols,
         "langgraph.checkpoint.base.BaseCheckpointSaver",
-        "langgraph.checkpoint.base.InMemorySaver",
         "langgraph.checkpoint.memory.InMemorySaver",
+    )
+
+
+def test_a_re_exported_symbol_is_deduped_to_its_public_path():
+    modules = given.a_state_graph_package_with_internal_all()
+
+    symbols = public_symbols(modules)
+
+    # StateGraph is re-exported by graph/__init__, so it collapses to the public path
+    # instead of also appearing at the internal module that defines it. add_messages
+    # lives only in state.py (never re-exported), so it stays at its module path.
+    then.the_qualnames_are(
+        symbols,
+        "langgraph.graph.StateGraph",
+        "langgraph.graph.state.add_messages",
     )
 
 
