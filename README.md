@@ -36,7 +36,7 @@ The system is brought from a deliberately naive baseline to a production-ready s
 4. **Cost and latency: measured caching.** Caching, with the proof that it did not degrade eval scores.
 5. **Observability and generation eval.** Open-standard instrumentation, a judge calibrated from error analysis on real outputs, and drift monitoring.
 
-The corpus is the LangGraph documentation prose and a curated set of issue threads (the API reference layer, generated from source docstrings, arrives in a later step). The clean docs test verifiable retrieval. The issue threads (outdated workarounds, contradictory advice, version-specific answers) are where quality drifts, and where the emergent criteria come from.
+The corpus is three layers: the LangGraph documentation prose, an API reference generated from source docstrings, and a curated set of issue threads. The clean docs test verifiable retrieval. The issue threads (outdated workarounds, contradictory advice, version-specific answers) are where quality drifts, and where the emergent criteria come from.
 
 ## Getting started
 
@@ -51,7 +51,7 @@ uv run rag query "how do I add a conditional edge in LangGraph?"
 
 The vector store is embedded Chroma. It runs in-process and persists to a gitignored local directory (`chroma/`), so there is no service to run and no Docker at this stage. A managed store behind the same `VectorStorePort` and a `docker-compose` stack arrive at step 3, the literal demo-to-production move.
 
-The corpus is fetched from a pinned upstream commit, so the build is reproducible. `make index` fetches the LangGraph documentation prose from the pinned `langchain-ai/docs` ref and reads the committed issue snapshot (`data/langgraph-issues.jsonl`, regenerable with `make fetch-issues`). The API reference layer, generated from source docstrings, arrives in a later step.
+The corpus is fetched from a pinned upstream commit, so the build is reproducible. `make index` fetches the LangGraph documentation prose from the pinned `langchain-ai/docs` ref, extracts the API reference layer from the pinned `langchain-ai/langgraph` source ref, and reads the committed issue snapshot (`data/langgraph-issues.jsonl`, regenerable with `make fetch-issues`).
 
 ## Step 1: the baseline and why it breaks
 

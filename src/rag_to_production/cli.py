@@ -9,9 +9,10 @@ from rag_to_production.adapters.llm import GeminiLLM
 from rag_to_production.adapters.vector_store import ChromaVectorStore
 from rag_to_production.config import Settings
 from rag_to_production.domain.models import Document, IndexStats, RagAnswer
+from rag_to_production.ingestion.api_reference import load_api_reference
 from rag_to_production.ingestion.corpus import load_docs
 from rag_to_production.ingestion.issues import load_issues
-from rag_to_production.ingestion.snapshot import fetch_snapshot
+from rag_to_production.ingestion.snapshot import fetch_snapshot, fetch_source_snapshot
 from rag_to_production.pipeline import answer_query, index_corpus
 
 
@@ -25,6 +26,7 @@ def main(argv: list[str] | None = None) -> int:
 
 def run_index(settings: Settings) -> int:
     fetch_snapshot(settings.snapshot_dir, settings.docs)
+    fetch_source_snapshot(settings.snapshot_dir, settings.api_ref)
     embedder = SentenceTransformersEmbedder(settings.embedder_model)
     store = ChromaVectorStore(settings.chroma_dir)
     stats = index_corpus(_load_corpus(settings), embedder, store, settings.chunking)
@@ -59,6 +61,7 @@ def _parse_args(argv: list[str] | None) -> argparse.Namespace:
 def _load_corpus(settings: Settings) -> Iterator[Document]:
     return chain(
         load_docs(settings.snapshot_dir, settings.docs.path),
+        load_api_reference(settings.snapshot_dir, settings.api_ref),
         load_issues(settings.issues_path),
     )
 
