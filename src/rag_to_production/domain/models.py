@@ -1,8 +1,7 @@
 from dataclasses import dataclass
 from typing import Literal
 
-# The corpus layers (ADR 003). "api_ref" is a decided layer not yet produced:
-# its ingestion (docstring extraction) is a later step.
+# The corpus layers (ADR 003).
 Source = Literal["docs", "api_ref", "issues"]
 
 
@@ -49,3 +48,16 @@ class ProseSource:
     repo: str
     ref: str
     path: str
+
+
+@dataclass(frozen=True)
+class SourceCheckout:
+    """Pinned origin of the API-reference layer: the package subtrees `paths` of `repo` at `ref`.
+
+    Each path is a `langgraph` package directory (its basename is the top-level
+    package, its parent is the prefix stripped to derive module qualnames).
+    """
+
+    repo: str
+    ref: str
+    paths: tuple[str, ...]
