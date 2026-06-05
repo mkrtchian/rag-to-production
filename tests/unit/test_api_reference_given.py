@@ -73,6 +73,33 @@ NOT_ALL_NON_INIT = dedent('''
         """Defined in a plain module that is not a public entry point."""
 ''')
 
+OVERLOADED_MODULE = dedent('''
+    from typing import overload
+
+
+    class Updater:
+        """Apply an update."""
+
+        @overload
+        def apply(self, value: int) -> int: ...
+        @overload
+        def apply(self, value: str) -> str: ...
+        def apply(self, value):
+            """Apply value and return it."""
+            return value
+
+
+    @overload
+    def merge(left: int, right: int) -> int: ...
+    @overload
+    def merge(left: str, right: str) -> str: ...
+    def merge(left, right):
+        """Merge left and right."""
+        return left + right
+
+    __all__ = ["Updater", "merge"]
+''')
+
 
 def a_module(source: str, *, is_package: bool) -> ModuleSource:
     return ModuleSource(source=source, is_package=is_package)

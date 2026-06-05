@@ -121,9 +121,20 @@ def _find_def(
         if (
             isinstance(node, ast.ClassDef | ast.FunctionDef | ast.AsyncFunctionDef)
             and node.name == name
+            and not _is_overload(node)
         ):
             return node
     return None
+
+
+def _is_overload(node: ast.ClassDef | ast.FunctionDef | ast.AsyncFunctionDef) -> bool:
+    if isinstance(node, ast.ClassDef):
+        return False
+    return any(
+        (isinstance(d, ast.Name) and d.id == "overload")
+        or (isinstance(d, ast.Attribute) and d.attr == "overload")
+        for d in node.decorator_list
+    )
 
 
 def _render_class(node: ast.ClassDef) -> str:
@@ -133,7 +144,7 @@ def _render_class(node: ast.ClassDef) -> str:
     for method in node.body:
         if not isinstance(method, ast.FunctionDef | ast.AsyncFunctionDef):
             continue
-        if method.name.startswith("_"):
+        if method.name.startswith("_") or _is_overload(method):
             continue
         lines.append("")
         lines.append(_indent(_signature_line(method), "    "))

@@ -117,6 +117,24 @@ def test_render_symbol_preserves_annotations_and_defaults():
     assert "def add_messages(left: list, right: list=[]) -> list:" in rendered
 
 
+def test_render_symbol_renders_the_implementation_not_overload_stubs():
+    rendered = render_symbol("m.merge", "merge", given.OVERLOADED_MODULE)
+
+    assert rendered is not None
+    assert "def merge(left, right):" in rendered
+    assert '"""Merge left and right."""' in rendered
+    assert "def merge(left: int, right: int) -> int:" not in rendered
+
+
+def test_class_methods_skip_overload_stubs():
+    rendered = render_symbol("m.Updater", "Updater", given.OVERLOADED_MODULE)
+
+    assert rendered is not None
+    assert "def apply(self, value):" in rendered
+    assert '"""Apply value and return it."""' in rendered
+    assert "def apply(self, value: int) -> int:" not in rendered
+
+
 def test_load_api_reference_walks_a_tmp_tree(tmp_path: Path):
     checkout = given.write_snapshot_tree(tmp_path)
 
